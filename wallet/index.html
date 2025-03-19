@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>多链钱包连接组件</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body class="bg-gray-100 min-h-screen flex items-center justify-center p-4">
+    <div class="max-w-4xl w-full mx-auto">
+        <!-- 示例应用容器 -->
+        <div class="bg-white rounded-xl shadow-lg p-6 mb-8">
+            <h1 class="text-2xl font-bold text-gray-800 mb-6">多链钱包连接组件演示</h1>
+            
+            <!-- 连接按钮组件 -->
+            <div class="flex justify-end">
+                <button id="connect-wallet-btn" class="bg-gradient-to-r from-blue-500 to-purple-600 text-white font-medium py-2 px-4 rounded-lg hover:shadow-lg transition-all duration-200 flex items-center">
+                    <i class="fas fa-wallet mr-2"></i>
+                    <span>连接钱包</span>
+                </button>
+                
+                <!-- 已连接状态（默认隐藏） -->
+                <button id="wallet-connected-btn" class="hidden bg-gray-100 border border-gray-200 text-gray-800 font-medium py-2 px-4 rounded-lg hover:bg-gray-200 transition-all duration-200 flex items-center">
+                    <div class="w-6 h-6 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 mr-2 flex items-center justify-center overflow-hidden">
+                        <img id="wallet-avatar" src="" alt="Wallet Avatar" class="w-full h-full object-cover">
+                    </div>
+                    <span id="wallet-address">0x1234...5678</span>
+                    <i class="fas fa-chevron-down ml-2 text-xs text-gray-500"></i>
+                </button>
+            </div>
+        </div>
+        
+        <!-- 组件展示区域 -->
+        <div class="grid grid-cols-1 gap-8">
+            <!-- 钱包选择弹窗组件预览 -->
+            <div class="bg-white rounded-xl shadow-lg p-6">
+                <h2 class="text-lg font-semibold text-gray-800 mb-4">钱包选择弹窗组件</h2>
+                <div id="wallet-selector-preview" class="border border-gray-200 rounded-lg p-4 overflow-auto">
+                    <!-- 钱包选择弹窗内容将在这里显示 -->
+                </div>
+            </div>
+            
+            <!-- 用户信息弹窗组件预览 -->
+            <div class="bg-white rounded-xl shadow-lg p-6">
+                <h2 class="text-lg font-semibold text-gray-800 mb-4">用户信息弹窗组件</h2>
+                <div id="user-info-preview" class="border border-gray-200 rounded-lg p-4 overflow-auto">
+                    <!-- 用户信息弹窗内容将在这里显示 -->
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 钱包选择弹窗组件 -->
+    <div id="wallet-selector-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-2xl shadow-xl w-full max-w-4xl max-h-[90vh] overflow-hidden">
+            <!-- 弹窗头部 -->
+            <div class="p-4 border-b border-gray-200 flex justify-between items-center">
+                <h3 class="text-lg font-semibold text-gray-800">连接钱包</h3>
+                <button id="close-wallet-selector" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <!-- 切链操作栏 -->
+            <div class="p-4 border-b border-gray-200 overflow-x-auto">
+                <div class="flex space-x-2 min-w-max">
+                    <button class="chain-btn active px-3 py-2 rounded-lg flex items-center" data-chain="ethereum">
+                        <img src="https://cryptologos.cc/logos/ethereum-eth-logo.png" alt="Ethereum" class="w-5 h-5 mr-2">
+                        <span>以太坊</span>
+                    </button>
+                    <button class="chain-btn px-3 py-2 rounded-lg flex items-center" data-chain="bitcoin">
+                        <img src="https://cryptologos.cc/logos/bitcoin-btc-logo.png" alt="Bitcoin" class="w-5 h-5 mr-2">
+                        <span>比特币</span>
+                    </button>
+                    <button class="chain-btn px-3 py-2 rounded-lg flex items-center" data-chain="solana">
+                        <img src="https://cryptologos.cc/logos/solana-sol-logo.png" alt="Solana" class="w-5 h-5 mr-2">
+                        <span>索拉纳</span>
+                    </button>
+                    <button class="chain-btn px-3 py-2 rounded-lg flex items-center" data-chain="polkadot">
+                        <img src="https://cryptologos.cc/logos/polkadot-new-dot-logo.png" alt="Polkadot" class="w-5 h-5 mr-2">
+                        <span>波卡</span>
+                    </button>
+                    <button class="chain-btn px-3 py-2 rounded-lg flex items-center" data-chain="cosmos">
+                        <img src="https://cryptologos.cc/logos/cosmos-atom-logo.png" alt="Cosmos" class="w-5 h-5 mr-2">
+                        <span>Cosmos</span>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- PC端布局：左右结构 -->
+            <div class="hidden md:flex h-[60vh]">
+                <!-- 左侧：钱包列表 -->
+                <div class="w-1/2 border-r border-gray-200 p-4 overflow-y-auto">
+                    <h4 class="text-sm font-medium text-gray-500 mb-3">选择钱包</h4>
+                    <div class="space-y-2 wallet-list" id="ethereum-wallets">
+                        <button class="wallet-btn w-full p-3 rounded-lg border border-gray-200 hover:bg-gray-50 transition-all duration-200 flex items-center justify-between">
+                            <div class="flex items-center">
+                                <img src="https://upload.wikimedia.org/wikipedia/commons/3/36/MetaMask_Fox.svg" alt="MetaMask" class="w-8 h-8 mr-3">
+                                <span class="font-medium">MetaMask</span>
+                            </div>
+                            <span class="text-xs text-blue-500 wallet-info-btn" data-wallet="metamask">
+                                <i class="fas fa-info-circle"></i>
+                            </span>
+                        </button>
+                        <button class="wallet-btn w-full p-3 rounded-lg border border-gray-200 hover:bg-gray-50 transition-all duration-200 flex items-center justify-between">
+                            <div class="flex items-center">
+                                <img src="https://altcoinsbox.com/wp-content/uploads/2023/01/wallet-connect-logo.png" alt="WalletConnect" class="w-8 h-8 mr-3">
+                                <span class="font-medium">WalletConnect</span>
+                            </div>
+                            <span class="text-xs text-blue-500 wallet-info-btn" data-wallet="walletconnect">
+                                <i class="fas fa-info-circle"></i>
+                            </span>
+                        </button>
+                        <button class="wallet-btn w-full p-3 rounded-lg border border-gray-200 hover:bg-gray-50 transition-all duration-200 flex items-center justify-between">
+                            <div class="flex items-center">
+                                <img src="https://altcoinsbox.com/wp-content/uploads/2023/03/coinbase-wallet-logo.webp" alt="Coinbase Wallet" class="w-8 h-8 mr-3">
+                                <span class="font-medium">Coinbase Wallet</span>
+                            </div>
+                            <span class="text-xs text-blue-500 wallet-info-btn" data-wallet="coinbase">
+                                <i class="fas fa-info-circle"></i>
+                            </span>
+                        </button>
+                    </div>
+                    
+                    <div class="space-y-2 wallet-list hidden" id="bitcoin-wallets">
+                        <button class="wallet-btn w-full p-3 rounded-lg border border-gray-200 hover:bg-gray-50 transition-all duration-200 flex items-center justify-between">
+                            <div class="flex items-center">
+                                <img src="https://cryptologos.cc/logos/bitcoin-btc-logo.png" alt="Bitcoin Core" class="w-8 h-8 mr-3">
+                                <span class="font-medium">Bitcoin Core</span>
+                            </div>
+                            <span class="text-xs text-blue-500 wallet-info-btn" data-wallet="bitcoincore">
+                                <i class="fas fa-info-circle"></i>
+                            </span>
+                        </button>
+                        <button class="wallet-btn w-full p-3 rounded-lg border border-gray-200 hover:bg-gray-50 transition-all duration-200 flex items-center justify-between">
+                            <div class="flex items-center">
+                                <img src="https://cryptologos.cc/logos/trezor-logo.png" alt="Trezor" class="w-8 h-8 mr-3">
+                                <span class="font-medium">Trezor</span>
+                            </div>
+                            <span class="text-xs text-blue-500 wallet-info-btn" data-wallet="trezor">
+                                <i class="fas fa-info-circle"></i>
+                            </span>
+                        </button>
+                    </div>
+                    
+                    <div class="space-y-2 wallet-list hidden" id="solana-wallets">
+                        <button class="wallet-btn w-full p-3 rounded-lg border border-gray-200 hover:bg-gray-50 transition-all duration-200 flex items-center justify-between">
+                            <div class="flex items-center">
+                                <img src="https://cryptologos.cc/logos/phantom-logo.png" alt="Phantom" class="w-8 h-8 mr-3">
+                                <span class="font-medium">Phantom</span>
+                            </div>
+                            <span class="text-xs text-blue-500 wallet-info-btn" data-wallet="phantom">
+                                <i class="fas fa-info-circle"></i>
+                            </span>
+                        </button>
+                        <button class="wallet-btn w-full p-3 rounded-lg border border-gray-200 hover:bg-gray-50 transition-all duration-200 flex items-center justify-between">
+                            <div class="flex items-center">
+                                <img src="https://cryptologos.cc/logos/solflare-logo.png" alt="Solflare" class="w-8 h-8 mr-3">
+                                <span class="font-medium">Solflare</span>
+                            </div>
+                            <span class="text-xs text-blue-500 wallet-info-btn" data-wallet="solflare">
+                                <i class="fas fa-info-circle"></i>
+                            </span>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- 右侧：宣传内容/钱包详情 -->
+                <div class="w-1/2 p-4 flex flex-col">
+                    <!-- 默认宣传内容 -->
+                    <div id="wallet-promo" class="flex-1 flex flex-col items-center justify-center">
+                        <img src="https://cryptologos.cc/logos/ethereum-eth-logo.png" alt="Multi-chain Wallet" class="w-24 h-24 mb-6">
+                        <h3 class="text-xl font-bold text-gray-800 mb-2">多链钱包连接</h3>
+                        <p class="text-gray-600 text-center mb-6 max-w-xs">
+                            安全便捷地连接您的加密钱包，支持多种区块链网络，一键管理您的数字资产。
+                        </p>
+                        <div class="flex space-x-2 mb-8">
+                            <div class="flex items-center text-sm text-gray-500">
+                                <i class="fas fa-shield-alt mr-1 text-green-500"></i>
+                                <span>安全可靠</span>
+                            </div>
+                            <div class="flex items-center text-sm text-gray-500">
+                                <i class="fas fa-bolt mr-1 text-yellow-500"></i>
+                                <span>快速连接</span>
+                            </div>
+                            <div class="flex items-center text-sm text-gray-500">
+                                <i class="fas fa-globe mr-1 text-blue-500"></i>
+                                <span>多链支持</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 推荐钱包列表（默认隐藏） -->
+                    <div id="recommended-wallets" class="hidden flex-1 overflow-y-auto">
+                        <h4 class="text-sm font-medium text-gray-500 mb-3">推荐钱包</h4>
+                        <div class="grid grid-cols-2 gap-3">
+                            <button class="recommended-wallet-btn p-3 rounded-lg border border-gray-200 hover:bg-gray-50 transition-all duration-200 flex flex-col items-center" data-wallet="metamask">
+                                <img src="https://upload.wikimedia.org/wikipedia/commons/3/36/MetaMask_Fox.svg" alt="MetaMask" class="w-12 h-12 mb-2">
+                                <span class="font-medium text-sm">MetaMask</span>
+                            </button>
+                            <button class="recommended-wallet-btn p-3 rounded-lg border border-gray-200 hover:bg-gray-50 transition-all duration-200 flex flex-col items-center" data-wallet="walletconnect">
+                                <img src="https://altcoinsbox.com/wp-content/uploads/2023/01/wallet-connect-logo.png" alt="WalletConnect" class="w-12 h-12 mb-2">
+                                <span class="font-medium text-sm">WalletConnect</span>
+                            </button>
+                            <button class="recommended-wallet-btn p-3 rounded-lg border border-gray-200 hover:bg-gray-50 transition-all duration-200 flex flex-col items-center" data-wallet="coinbase">
+                                <img src="https://altcoinsbox.com/wp-content/uploads/2023/03/coinbase-wallet-logo.webp" alt="Coinbase Wallet" class="w-12 h-12 mb-2">
+                                <span class="font-medium text-sm">Coinbase Wallet</span>
+                            </button>
+                            <button class="recommended-wallet-btn p-3 rounded-lg border border-gray-200 hover:bg-gray-50 transition-all duration-200 flex flex-col items-center" data-wallet="phantom">
+                                <img src="https://cryptologos.cc/logos/phantom-logo.png" alt="Phantom" class="w-12 h-12 mb-2">
+                                <span class="font-medium text-sm">Phantom</span>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- 钱包详情（默认隐藏） -->
+                    <div id="wallet-detail" class="hidden flex-1 flex flex-col">
+                        <div class="flex items-center mb-4">
+                            <button id="back-to-recommended" class="text-blue-500 mr-2">
+                                <i class="fas fa-arrow-left"></i>
+                            </button>
+                            <h4 class="text-lg font-medium text-gray-800" id="detail-wallet-name">MetaMask</h4>
+                        </div>
+                        
+                        <div class="flex-1 overflow-y-auto">
+                            <div class="flex flex-col space-y-4">
+                                <a href="#" id="detail-chrome-link" class="block p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-all duration-200">
+                                    <div class="flex items-center justify-between mb-2">
+                                        <div class="flex items-center">
+                                            <i class="fab fa-chrome text-2xl text-blue-500 mr-2"></i>
+                                            <span class="font-medium">Chrome插件</span>
+                                        </div>
+                                        <i class="fas fa-external-link-alt text-gray-400"></i>
+                                    </div>
+                                    <p class="text-sm text-gray-500">安装浏览器插件，在PC端使用钱包</p>
+                                </a>
+                                
+                                <button id="show-qrcode-btn" class="block p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-all duration-200 text-left">
+                                    <div class="flex items-center justify-between mb-2">
+                                        <div class="flex items-center">
+                                            <i class="fas fa-mobile-alt text-2xl text-green-500 mr-2"></i>
+                                            <span class="font-medium">移动应用</span>
+                                        </div>
+                                        <i class="fas fa-qrcode text-gray-400"></i>
+                                    </div>
+                                    <p class="text-sm text-gray-500">扫描二维码下载移动应用</p>
+                                </button>
+                                
+                                <!-- 二维码（默认隐藏） -->
+                                <div id="qrcode-container" class="hidden p-4 border border-gray-200 rounded-lg bg-gray-50">
+                                    <div class="flex justify-between items-center mb-3">
+                                        <span class="font-medium">扫描下载</span>
+                                        <button id="close-qrcode" class="text-gray-500">
+                                            <i class="fas fa-times"></i>
+                                        </button>
+                                    </div>
+                                    <div class="flex justify-center">
+                                        <div id="wallet-qrcode" class="w-40 h-40 bg-white p-2 rounded-lg flex items-center justify-center">
+                                            <i class="fas fa-qrcode text-6xl text-gray-300"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 底部按钮 -->
+                    <div class="mt-4 pt-4 border-t border-gray-200">
+                        <button id="get-wallet-btn" class="w-full p-3 rounded-lg bg-gradient-to-r from-blue-500 to-purple-600 text-white font-medium hover:shadow-lg transition-all duration-200 flex items-center justify-center">
+                            <i class="fas fa-download mr-2"></i>
+                            <span>获取钱包</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 移动端布局：上中下结构 -->
+            <div class="md:hidden flex flex-col h-[70vh]">
+                <!-- 中间：钱包列表/推荐钱包/钱包详情（根据状态切换） -->
+                <div class="flex-1 overflow-y-auto">
+                    <!-- 钱包列表 -->
+                    <div id="mobile-wallet-list" class="p-4">
+                        <h4 class="text-sm font-medium text-gray-500 mb-3">选择钱包</h4>
+                        <div class="space-y-2 wallet-list" id="mobile-ethereum-wallets">
+                            <button class="wallet-btn w-full p-3 rounded-lg border border-gray-200 hover:bg-gray-50 transition-all duration-200 flex items-center justify-between">
+                                <div class="flex items-center">
+                                    <img src="https://upload.wikimedia.org/wikipedia/commons/3/36/MetaMask_Fox.svg" alt="MetaMask" class="w-8 h-8 mr-3">
+                                    <span class="font-medium">MetaMask</span>
+                                </div>
+                                <span class="text-xs text-blue-500 wallet-info-btn" data-wallet="metamask">
+                                    <i class="fas fa-info-circle"></i>
+                                </span>
+                            </button>
+                            <button class="wallet-btn w-full p-3 rounded-lg border border-gray-200 hover:bg-gray-50 transition-all duration-200 flex items-center justify-between">
+                                <div class="flex items-center">
+                                    <img src="https://altcoinsbox.com/wp-content/uploads/2023/01/wallet-connect-logo.png" alt="WalletConnect" class="w-8 h-8 mr-3">
+                                    <span class="font-medium">WalletConnect</span>
+                                </div>
+                                <span class="text-xs text-blue-500 wallet-info-btn" data-wallet="walletconnect">
+                                    <i class="fas fa-info-circle"></i>
+                                </span>
+                            </button>
+                            <button class="wallet-btn w-full p-3 rounded-lg border border-gray-200 hover:bg-gray-50 transition-all duration-200 flex items-center justify-between">
+                                <div class="flex items-center">
+                                    <img src="https://altcoinsbox.com/wp-content/uploads/2023/03/coinbase-wallet-logo.webp" alt="Coinbase Wallet" class="w-8 h-8 mr-3">
+                                    <span class="font-medium">Coinbase Wallet</span>
+                                </div>
+                                <span class="text-xs text-blue-500 wallet-info-btn" data-wallet="coinbase">
+                                    <i class="fas fa-info-circle"></i>
+                                </span>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- 推荐钱包列表（默认隐藏） -->
+                    <div id="mobile-recommended-wallets" class="hidden p-4">
+                        <div class="flex items-center mb-4">
+                            <button id="mobile-back-to-wallets" class="text-blue-500 mr-2">
+                                <i class="fas fa-arrow-left"></i>
+                            </button>
+                            <h4 class="text-lg font-medium text-gray-800">推荐钱包</h4>
+                        </div>
+                        
+                        <div class="grid grid-cols-2 gap-3">
+                            <button class="mobile-recommended-wallet-btn p-3 rounded-lg border border-gray-200 hover:bg-gray-50 transition-all duration-200 flex flex-col items-center" data-wallet="metamask">
+                                <img src="https://upload.wikimedia.org/wikipedia/commons/3/36/MetaMask_Fox.svg" alt="MetaMask" class="w-12 h-12 mb-2">
+                                <span class="font-medium text-sm">MetaMask</span>
+                            </button>
+                            <button class="mobile-recommended-wallet-btn p-3 rounded-lg border border-gray-200 hover:bg-gray-50 transition-all duration-200 flex flex-col items-center" data-wallet="walletconnect">
+                                <img src="https://altcoinsbox.com/wp-content/uploads/2023/01/wallet-connect-logo.png" alt="WalletConnect" class="w-12 h-12 mb-2">
+                                <span class="font-medium text-sm">WalletConnect</span>
+                            </button>
+                            <button class="mobile-recommended-wallet-btn p-3 rounded-lg border border-gray-200 hover:bg-gray-50 transition-all duration-200 flex flex-col items-center" data-wallet="coinbase">
+                                <img src="https://altcoinsbox.com/wp-content/uploads/2023/03/coinbase-wallet-logo.webp" alt="Coinbase Wallet" class="w-12 h-12 mb-2">
+                                <span class="font-medium text-sm">Coinbase Wallet</span>
+                            </button>
+                            <button class="mobile-recommended-wallet-btn p-3 rounded-lg border border-gray-200 hover:bg-gray-50 transition-all duration-200 flex flex-col items-center" data-wallet="phantom">
+                                <img src="https://cryptologos.cc/logos/phantom-logo.png" alt="Phantom" class="w-12 h-12 mb-2">
+                                <span class="font-medium text-sm">Phantom</span>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- 钱包详情（默认隐藏） -->
+                    <div id="mobile-wallet-detail" class="hidden p-4">
+                        <div class="flex items-center mb-4">
+                            <button id="mobile-back-to-recommended" class="text-blue-500 mr-2">
+                                <i class="fas fa-arrow-left"></i>
+                            </button>
+                            <h4 class="text-lg font-medium text-gray-800" id="mobile-detail-wallet-name">MetaMask</h4>
+                        </div>
+                        
+                        <div class="flex flex-col space-y-4">
+                            <a href="#" id="mobile-detail-chrome-link" class="block p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-all duration-200">
+                                <div class="flex items-center justify-between mb-2">
+                                    <div class="flex items-center">
+                                        <i class="fab fa-chrome text-2xl text-blue-500 mr-2"></i>
+                                        <span class="font-medium">Chrome插件</span>
+                                    </div>
+                                    <i class="fas fa-external-link-alt text-gray-400"></i>
+                                </div>
+                                <p class="text-sm text-gray-500">安装浏览器插件，在PC端使用钱包</p>
+                            </a>
+                            
+                            <button id="mobile-show-qrcode-btn" class="block p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-all duration-200 text-left">
+                                <div class="flex items-center justify-between mb-2">
+                                    <div class="flex items-center">
+                                        <i class="fas fa-mobile-alt text-2xl text-green-500 mr-2"></i>
+                                        <span class="font-medium">移动应用</span>
+                                    </div>
+                                    <i class="fas fa-qrcode text-gray-400"></i>
+                                </div>
+                                <p class="text-sm text-gray-500">扫描二维码下载移动应用</p>
+                            </button>
+                            
+                            <!-- 二维码（默认隐藏） -->
+                            <div id="mobile-qrcode-container" class="hidden p-4 border border-gray-200 rounded-lg bg-gray-50">
+                                <div class="flex justify-between items-center mb-3">
+                                    <span class="font-medium">扫描下载</span>
+                                    <button id="mobile-close-qrcode" class="text-gray-500">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
+                                <div class="flex justify-center">
+                                    <div id="mobile-wallet-qrcode" class="w-40 h-40 bg-white p-2 rounded-lg flex items-center justify-center">
+                                        <i class="fas fa-qrcode text-6xl text-gray-300"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 底部栏 -->
+                <div class="p-4 border-t border-gray-200 flex justify-between items-center">
+                    <div class="text-sm text-gray-500">
+                        <span id="mobile-selected-chain">以太坊</span> 钱包
+                    </div>
+                    <button id="mobile-get-wallet-btn" class="px-4 py-2 rounded-lg bg-gradient-to-r from-blue-500 to-purple-600 text-white font-medium text-sm hover:shadow-lg transition-all duration-200 flex items-center">
+                        <i class="fas fa-download mr-1"></i>
+                        <span>获取钱包</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 钱包信息弹窗 -->
+    <div id="wallet-info-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-2xl shadow-xl max-w-md w-full overflow-hidden">
+            <div class="p-4 border-b border-gray-200 flex justify-between items-center">
+                <h3 class="text-lg font-semibold text-gray-800">钱包信息</h3>
+                <button id="close-wallet-info" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="p-6">
+                <div id="wallet-info-content" class="flex flex-col items-center">
+                    <img id="wallet-info-logo" src="" alt="Wallet Logo" class="w-16 h-16 mb-4">
+                    <h4 id="wallet-info-name" class="text-xl font-bold mb-4">MetaMask</h4>
+                    
+                    <div class="grid grid-cols-2 gap-4 w-full mb-6">
+                        <a href="#" id="wallet-chrome-link" class="flex flex-col items-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-all duration-200">
+                            <i class="fab fa-chrome text-2xl mb-2 text-blue-500"></i>
+                            <span class="text-sm text-gray-600">Chrome插件</span>
+                        </a>
+                        <div class="flex flex-col items-center p-4 border border-gray-200 rounded-lg">
+                            <div id="wallet-qrcode" class="w-20 h-20 bg-gray-200 flex items-center justify-center mb-2">
+                                <i class="fas fa-qrcode text-2xl text-gray-400"></i>
+                            </div>
+                            <span class="text-sm text-gray-600">APP下载</span>
+                        </div>
+                    </div>
+                    
+                    <p class="text-sm text-gray-500 text-center">
+                        扫描二维码下载移动应用或点击安装浏览器插件
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 用户信息弹窗组件 -->
+    <div id="user-info-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-2xl shadow-xl max-w-sm w-full overflow-hidden">
+            <div class="p-6 flex flex-col items-center">
+                <!-- 用户头像 -->
+                <div class="w-20 h-20 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 mb-4 flex items-center justify-center overflow-hidden">
+                    <img id="user-avatar" src="https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y" alt="User Avatar" class="w-full h-full object-cover">
+                </div>
+                
+                <!-- 当前网络 -->
+                <div class="bg-gray-100 rounded-full px-3 py-1 text-sm text-gray-700 flex items-center mb-4">
+                    <img id="current-chain-icon" src="https://cryptologos.cc/logos/ethereum-eth-logo.png" alt="Ethereum" class="w-4 h-4 mr-1">
+                    <span id="current-chain-name">以太坊</span>
+                </div>
+                
+                <!-- 钱包地址 -->
+                <div class="bg-gray-100 rounded-lg p-3 w-full flex items-center justify-between mb-6">
+                    <span id="full-wallet-address" class="text-gray-700 text-sm font-mono">0x1234567890abcdef1234567890abcdef12345678</span>
+                    <button id="copy-address-btn" class="text-blue-500 hover:text-blue-700">
+                        <i class="far fa-copy"></i>
+                    </button>
+                </div>
+                
+                <!-- 操作按钮 -->
+                <div class="w-full space-y-2">
+                    <button id="change-network-btn" class="w-full p-3 rounded-lg border border-gray-200 hover:bg-gray-50 transition-all duration-200 flex items-center justify-center">
+                        <i class="fas fa-exchange-alt mr-2 text-gray-600"></i>
+                        <span>切换网络</span>
+                    </button>
+                    <button id="disconnect-wallet-btn" class="w-full p-3 rounded-lg border border-red-200 text-red-500 hover:bg-red-50 transition-all duration-200 flex items-center justify-center">
+                        <i class="fas fa-sign-out-alt mr-2"></i>
+                        <span>断开连接</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="wallet-connect.js"></script>
+</body>
+</html>

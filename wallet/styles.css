@@ -1,0 +1,53 @@
+/* 自定义样式 */
+.chain-btn {
+    color: #6B7280;
+    background-color: #F3F4F6;
+    transition: all 0.2s ease;
+}
+
+.chain-btn.active {
+    color: #1F2937;
+    background-color: #E5E7EB;
+    font-weight: 500;
+}
+
+.chain-btn:hover:not(.active) {
+    background-color: #E5E7EB;
+}
+
+/* 钱包按钮悬停效果 */
+.wallet-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+}
+
+/* 复制成功动画 */
+@keyframes copied {
+    0% { opacity: 0; transform: translateY(10px); }
+    10% { opacity: 1; transform: translateY(0); }
+    90% { opacity: 1; transform: translateY(0); }
+    100% { opacity: 0; transform: translateY(-10px); }
+}
+
+.copied-message {
+    animation: copied 1.5s ease-in-out forwards;
+}
+
+/* 模态框动画 */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes slideUp {
+    from { transform: translateY(20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+.modal-container {
+    animation: fadeIn 0.3s ease-out;
+}
+
+.modal-content {
+    animation: slideUp 0.3s ease-out;
+} 
