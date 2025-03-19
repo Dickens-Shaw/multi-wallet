@@ -2,16 +2,15 @@ import styled from 'styled-components';
 
 const DropdownContainer = styled.div<{ $isOpen: boolean; $disabled: boolean }>`
 	position: relative;
-	width: 200px;
+	width: 70px;
 	cursor: ${({ $disabled }) => ($disabled ? 'not-allowed' : 'pointer')};
 	opacity: ${({ $disabled }) => ($disabled ? 0.6 : 1)};
 `;
 
 const DropdownLabel = styled.div`
-	padding: 8px 12px;
-	border: 1px solid #ccc;
-	border-radius: 4px;
-	background: white;
+	padding: 1px 6px;
+	border: 2px solid #000;
+	background: rgb(239, 239, 239);
 	transition: all 0.2s;
 
 	&:hover {
@@ -25,8 +24,7 @@ const DropdownList = styled.ul<{ $isOpen: boolean }>`
 	max-height: 200px;
 	margin-top: 4px;
 	padding: 0;
-	border: 1px solid #ccc;
-	border-radius: 4px;
+	border: 2px solid #000;
 	background: white;
 	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 	overflow-y: auto;
@@ -37,11 +35,11 @@ const DropdownList = styled.ul<{ $isOpen: boolean }>`
 `;
 
 const OptionItem = styled.li`
-	padding: 8px 12px;
+	padding: 1px 6px;
 	list-style: none;
 	cursor: pointer;
 	transition: background 0.2s;
-
+	
 	&:hover {
 		background: #f5f5f5;
 	}
@@ -57,17 +55,17 @@ const DefaultOption = styled.span`
 `;
 
 const ArrowIcon = styled.svg<{ $isOpen: boolean }>`
-	position: absolute;
-	right: 12px;
-	top: 50%;
-	transform: translateY(-50%) rotate(${({ $isOpen }) => ($isOpen ? '180deg' : '0')});
+	font-size: 12px;
+	transform: rotate(${({ $isOpen }) => ($isOpen ? '180deg' : '0')});
 	transition: transform 0.2s ease;
 	pointer-events: none;
 `;
 
 const ArrowWrapper = styled.div`
-	position: relative;
-	padding-right: 28px; // 为箭头预留空间
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 4px;
 `;
 
 export { DropdownContainer, DropdownLabel, DropdownList, OptionItem, DefaultOption, ArrowIcon, ArrowWrapper };

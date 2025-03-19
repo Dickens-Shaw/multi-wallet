@@ -27,16 +27,16 @@ export function ConnectedInfo({ avatar, walletAddress, onClick, className }: any
 					onChange={switchNetwork}
 					renderOptionItem={(option, isSelected) => {
 						return (
-							<div>
+							<div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
 								{option.label}
-								{isSelected && <span>✔</span>}
+								{isSelected && <span style={{ fontSize: '12px' }}>✔</span>}
 							</div>
 						);
 					}}
 				/>
 			)}
 
-			<button onClick={() => onClick()}>
+			<button style={{ display: 'flex', alignItems: 'center', gap: '4px' }} onClick={() => onClick()}>
 				{avatar?.text}
 				<span>{formatAddress(walletAddress)}</span>
 			</button>
