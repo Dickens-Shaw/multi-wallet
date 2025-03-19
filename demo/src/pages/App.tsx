@@ -25,7 +25,6 @@ export default function App() {
 					blockExplorerUrls: ['https://xscscan.com']
 				}
 			]}
-			isTokenUp
 			showNetwork
 		>
 			<Demo />
