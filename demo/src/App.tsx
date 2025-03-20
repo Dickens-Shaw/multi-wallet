@@ -9,22 +9,9 @@ export default function App() {
 			language={language}
 			theme={theme}
 			defaultChainType={ChainType.EVM}
-			defaultChainId={33772211}
+			defaultChainId={1}
 			supportWallets={[SupportWallet.METAMASK, SupportWallet.PHANTOM]}
-			customEvmNetworks={[
-				{
-					chainId: 3721,
-					chainName: 'Xone Mainnet',
-					rpcUrls: ['https://rpc.xone.org'],
-					iconUrls: [],
-					nativeCurrency: {
-						name: 'XOne Coin',
-						symbol: 'XOC',
-						decimals: 18
-					},
-					blockExplorerUrls: ['https://xscscan.com']
-				}
-			]}
+			customEvmNetworks={[]}
 			showNetwork
 		>
 			<Demo />

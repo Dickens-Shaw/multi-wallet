@@ -60,6 +60,18 @@ export const EvmNetworks: NetworkInfo[] = [
 			decimals: 18
 		},
 		blockExplorerUrls: ['https://testnet.xscscan.com']
+	},
+	{
+		chainId: 3721,
+		chainName: 'Xone Mainnet',
+		rpcUrls: ['https://rpc.xone.org'],
+		iconUrls: [],
+		nativeCurrency: {
+			name: 'XOne Coin',
+			symbol: 'XOC',
+			decimals: 18
+		},
+		blockExplorerUrls: ['https://xscscan.com']
 	}
 ];
 

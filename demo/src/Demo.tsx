@@ -1,456 +1,13 @@
 import { ConnectButton, ChainType, useWalletKit, getWalletKit, PutNetType, SolNetType, ConnectStatus } from 'multi-wallet';
 import { useEffect, useMemo, useState } from 'react';
 import { Connection, Keypair, PublicKey, SystemProgram, Transaction } from '@solana/web3.js';
+import { MULTICALL3_ADDRESS, MULTICALL3_ABI } from './constant';
 
 declare global {
 	interface Window {
 		WalletKit: any;
 	}
 }
-
-// Constants declared outside the class
-const MULTICALL3_ADDRESS = '0xe0E7B3133B41E9b5F9858C370FB9909E77Bc247c';
-
-const MULTICALL3_ABI = [
-	{
-		inputs: [
-			{
-				components: [
-					{
-						internalType: 'address',
-						name: 'target',
-						type: 'address'
-					},
-					{
-						internalType: 'bytes',
-						name: 'callData',
-						type: 'bytes'
-					}
-				],
-				internalType: 'struct Multicall3.Call[]',
-				name: 'calls',
-				type: 'tuple[]'
-			}
-		],
-		name: 'aggregate',
-		outputs: [
-			{
-				internalType: 'uint256',
-				name: 'blockNumber',
-				type: 'uint256'
-			},
-			{
-				internalType: 'bytes[]',
-				name: 'returnData',
-				type: 'bytes[]'
-			}
-		],
-		stateMutability: 'payable',
-		type: 'function'
-	},
-	{
-		inputs: [
-			{
-				components: [
-					{
-						internalType: 'address',
-						name: 'target',
-						type: 'address'
-					},
-					{
-						internalType: 'bool',
-						name: 'allowFailure',
-						type: 'bool'
-					},
-					{
-						internalType: 'bytes',
-						name: 'callData',
-						type: 'bytes'
-					}
-				],
-				internalType: 'struct Multicall3.Call3[]',
-				name: 'calls',
-				type: 'tuple[]'
-			}
-		],
-		name: 'aggregate3',
-		outputs: [
-			{
-				components: [
-					{
-						internalType: 'bool',
-						name: 'success',
-						type: 'bool'
-					},
-					{
-						internalType: 'bytes',
-						name: 'returnData',
-						type: 'bytes'
-					}
-				],
-				internalType: 'struct Multicall3.Result[]',
-				name: 'returnData',
-				type: 'tuple[]'
-			}
-		],
-		stateMutability: 'payable',
-		type: 'function'
-	},
-	{
-		inputs: [
-			{
-				components: [
-					{
-						internalType: 'address',
-						name: 'target',
-						type: 'address'
-					},
-					{
-						internalType: 'bool',
-						name: 'allowFailure',
-						type: 'bool'
-					},
-					{
-						internalType: 'uint256',
-						name: 'value',
-						type: 'uint256'
-					},
-					{
-						internalType: 'bytes',
-						name: 'callData',
-						type: 'bytes'
-					}
-				],
-				internalType: 'struct Multicall3.Call3Value[]',
-				name: 'calls',
-				type: 'tuple[]'
-			}
-		],
-		name: 'aggregate3Value',
-		outputs: [
-			{
-				components: [
-					{
-						internalType: 'bool',
-						name: 'success',
-						type: 'bool'
-					},
-					{
-						internalType: 'bytes',
-						name: 'returnData',
-						type: 'bytes'
-					}
-				],
-				internalType: 'struct Multicall3.Result[]',
-				name: 'returnData',
-				type: 'tuple[]'
-			}
-		],
-		stateMutability: 'payable',
-		type: 'function'
-	},
-	{
-		inputs: [
-			{
-				components: [
-					{
-						internalType: 'address',
-						name: 'target',
-						type: 'address'
-					},
-					{
-						internalType: 'bytes',
-						name: 'callData',
-						type: 'bytes'
-					}
-				],
-				internalType: 'struct Multicall3.Call[]',
-				name: 'calls',
-				type: 'tuple[]'
-			}
-		],
-		name: 'blockAndAggregate',
-		outputs: [
-			{
-				internalType: 'uint256',
-				name: 'blockNumber',
-				type: 'uint256'
-			},
-			{
-				internalType: 'bytes32',
-				name: 'blockHash',
-				type: 'bytes32'
-			},
-			{
-				components: [
-					{
-						internalType: 'bool',
-						name: 'success',
-						type: 'bool'
-					},
-					{
-						internalType: 'bytes',
-						name: 'returnData',
-						type: 'bytes'
-					}
-				],
-				internalType: 'struct Multicall3.Result[]',
-				name: 'returnData',
-				type: 'tuple[]'
-			}
-		],
-		stateMutability: 'payable',
-		type: 'function'
-	},
-	{
-		inputs: [
-			{
-				internalType: 'bool',
-				name: 'requireSuccess',
-				type: 'bool'
-			},
-			{
-				components: [
-					{
-						internalType: 'address',
-						name: 'target',
-						type: 'address'
-					},
-					{
-						internalType: 'bytes',
-						name: 'callData',
-						type: 'bytes'
-					}
-				],
-				internalType: 'struct Multicall3.Call[]',
-				name: 'calls',
-				type: 'tuple[]'
-			}
-		],
-		name: 'tryAggregate',
-		outputs: [
-			{
-				components: [
-					{
-						internalType: 'bool',
-						name: 'success',
-						type: 'bool'
-					},
-					{
-						internalType: 'bytes',
-						name: 'returnData',
-						type: 'bytes'
-					}
-				],
-				internalType: 'struct Multicall3.Result[]',
-				name: 'returnData',
-				type: 'tuple[]'
-			}
-		],
-		stateMutability: 'payable',
-		type: 'function'
-	},
-	{
-		inputs: [
-			{
-				internalType: 'bool',
-				name: 'requireSuccess',
-				type: 'bool'
-			},
-			{
-				components: [
-					{
-						internalType: 'address',
-						name: 'target',
-						type: 'address'
-					},
-					{
-						internalType: 'bytes',
-						name: 'callData',
-						type: 'bytes'
-					}
-				],
-				internalType: 'struct Multicall3.Call[]',
-				name: 'calls',
-				type: 'tuple[]'
-			}
-		],
-		name: 'tryBlockAndAggregate',
-		outputs: [
-			{
-				internalType: 'uint256',
-				name: 'blockNumber',
-				type: 'uint256'
-			},
-			{
-				internalType: 'bytes32',
-				name: 'blockHash',
-				type: 'bytes32'
-			},
-			{
-				components: [
-					{
-						internalType: 'bool',
-						name: 'success',
-						type: 'bool'
-					},
-					{
-						internalType: 'bytes',
-						name: 'returnData',
-						type: 'bytes'
-					}
-				],
-				internalType: 'struct Multicall3.Result[]',
-				name: 'returnData',
-				type: 'tuple[]'
-			}
-		],
-		stateMutability: 'payable',
-		type: 'function'
-	},
-	{
-		inputs: [],
-		name: 'getBasefee',
-		outputs: [
-			{
-				internalType: 'uint256',
-				name: 'basefee',
-				type: 'uint256'
-			}
-		],
-		stateMutability: 'view',
-		type: 'function'
-	},
-	{
-		inputs: [
-			{
-				internalType: 'uint256',
-				name: 'blockNumber',
-				type: 'uint256'
-			}
-		],
-		name: 'getBlockHash',
-		outputs: [
-			{
-				internalType: 'bytes32',
-				name: 'blockHash',
-				type: 'bytes32'
-			}
-		],
-		stateMutability: 'view',
-		type: 'function'
-	},
-	{
-		inputs: [],
-		name: 'getBlockNumber',
-		outputs: [
-			{
-				internalType: 'uint256',
-				name: 'blockNumber',
-				type: 'uint256'
-			}
-		],
-		stateMutability: 'view',
-		type: 'function'
-	},
-	{
-		inputs: [],
-		name: 'getChainId',
-		outputs: [
-			{
-				internalType: 'uint256',
-				name: 'chainid',
-				type: 'uint256'
-			}
-		],
-		stateMutability: 'view',
-		type: 'function'
-	},
-	{
-		inputs: [],
-		name: 'getCurrentBlockCoinbase',
-		outputs: [
-			{
-				internalType: 'address',
-				name: 'coinbase',
-				type: 'address'
-			}
-		],
-		stateMutability: 'view',
-		type: 'function'
-	},
-	{
-		inputs: [],
-		name: 'getCurrentBlockDifficulty',
-		outputs: [
-			{
-				internalType: 'uint256',
-				name: 'difficulty',
-				type: 'uint256'
-			}
-		],
-		stateMutability: 'view',
-		type: 'function'
-	},
-	{
-		inputs: [],
-		name: 'getCurrentBlockGasLimit',
-		outputs: [
-			{
-				internalType: 'uint256',
-				name: 'gaslimit',
-				type: 'uint256'
-			}
-		],
-		stateMutability: 'view',
-		type: 'function'
-	},
-	{
-		inputs: [],
-		name: 'getCurrentBlockTimestamp',
-		outputs: [
-			{
-				internalType: 'uint256',
-				name: 'timestamp',
-				type: 'uint256'
-			}
-		],
-		stateMutability: 'view',
-		type: 'function'
-	},
-	{
-		inputs: [
-			{
-				internalType: 'address',
-				name: 'addr',
-				type: 'address'
-			}
-		],
-		name: 'getEthBalance',
-		outputs: [
-			{
-				internalType: 'uint256',
-				name: 'balance',
-				type: 'uint256'
-			}
-		],
-		stateMutability: 'view',
-		type: 'function'
-	},
-	{
-		inputs: [],
-		name: 'getLastBlockHash',
-		outputs: [
-			{
-				internalType: 'bytes32',
-				name: 'blockHash',
-				type: 'bytes32'
-			}
-		],
-		stateMutability: 'view',
-		type: 'function'
-	}
-] as const;
 
 const Demo = () => {
 	const {
@@ -480,7 +37,8 @@ const Demo = () => {
 		waitForTransactionReceipt,
 		getSupportNets
 	} = useWalletKit();
-	const chainList = [ChainType.EVM, ChainType.PUT, ChainType.SOL, ChainType.Tron, ChainType.BTC];
+
+	const chainList = [ChainType.EVM, ChainType.SOL, ChainType.Tron, ChainType.BTC, ChainType.PUT];
 	const handleConnect = async () => {
 		try {
 			const res = await connect();
@@ -600,12 +158,10 @@ const Demo = () => {
 			<h2>Info</h2>
 			<p></p>
 			<div>Current Chain: {currentChainType}</div>
-			{[ChainType.EVM, ChainType.Tron].includes(currentChainType) && (
-				<div>
-					Current Network: 
-					{`${currentNetwork?.nativeCurrency.symbol}-(${currentNetwork?.chainId})-[${currentNetwork?.chainName}]`}
-				</div>
-			)}
+			<div>
+				Current Network:
+				{[ChainType.EVM, ChainType.Tron].includes(currentChainType) ? `${currentNetwork?.nativeCurrency.symbol}-(${currentNetwork?.chainId})-[${currentNetwork?.chainName}]` : `-`}
+			</div>
 			<div>Wallet Name: {currentConnector?.name}</div>
 			<div
 				style={{
@@ -619,19 +175,19 @@ const Demo = () => {
 			<div style={{ display: 'flex', gap: '15px', marginTop: '15px', flexWrap: 'wrap' }}>
 				<button onClick={() => handleConnect()}>Connect Wallet</button>
 				<button onClick={() => handleDisconnect()}>Disconnect</button>
-				<button onClick={openInfoModal}>Open Info Modal</button>
-				<button onClick={handleGetWalletKit}>Get WalletKit</button>
+				<button onClick={() => openInfoModal()}>Open Info Modal</button>
+				<button onClick={() => handleGetWalletKit()}>Get WalletKit</button>
 				<button onClick={() => handleGetProvider()}>Get Provider</button>
 			</div>
 			{connectStatus === ConnectStatus.Disconnected && (
 				<>
 					<p>Switch Chain</p>
 					<div style={{ display: 'flex', gap: '15px', marginTop: '15px', flexWrap: 'wrap' }}>
-				{chainList.map(chainType => (
-					<button key={chainType} onClick={() => setChainType(chainType)}>
-						Switch to {chainType}
-					</button>
-				))}
+						{chainList.map(chainType => (
+							<button key={chainType} onClick={() => setChainType(chainType)}>
+								Switch to {chainType}
+							</button>
+						))}
 					</div>
 				</>
 			)}
@@ -659,7 +215,7 @@ const Demo = () => {
 			{[ChainType.SOL, ChainType.PUT].includes(currentChainType as any) && (
 				<>
 					<p>
-						Switch to 
+						Switch to
 						{ChainType.SOL === currentChainType ? 'SOL' : 'PUT'}
 						Network
 					</p>
