@@ -146,17 +146,20 @@ const Demo = () => {
 
 	return (
 		<div>
-			<div>
-				theme: {theme}, language: {language}
-			</div>
-			<div style={{ display: 'flex', gap: '15px', marginTop: '15px' }}>
-				<button onClick={() => toggleTheme()}>change theme</button>
-				<button onClick={() => setLanguage(language === 'zh' ? 'en' : 'zh')}>change lng</button>
-			</div>
 			<h2>Connect Button</h2>
 			<ConnectButton />
 			<h2>Info</h2>
 			<p></p>
+			<div>
+				Theme: {theme}
+			</div>
+			<div>
+				Language: {language}
+			</div>
+			<p></p>
+			<div style={{ display: 'flex', gap: '15px', marginTop: '15px' }}>
+
+			</div>
 			<div>Current Chain: {currentChainType}</div>
 			<div>
 				Current Network:
@@ -172,6 +175,10 @@ const Demo = () => {
 			</div>
 			<h2>Methods</h2>
 			<p>Basic</p>
+			<div style={{ display: 'flex', gap: '15px', marginTop: '15px', flexWrap: 'wrap' }}>
+				<button onClick={() => toggleTheme()}>Toggle Theme</button>
+				<button onClick={() => setLanguage(language === 'zh' ? 'en' : 'zh')}>Toggle Language</button>
+			</div>
 			<div style={{ display: 'flex', gap: '15px', marginTop: '15px', flexWrap: 'wrap' }}>
 				<button onClick={() => handleConnect()}>Connect Wallet</button>
 				<button onClick={() => handleDisconnect()}>Disconnect</button>
