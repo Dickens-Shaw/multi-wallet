@@ -1,4 +1,4 @@
-import { ChainType } from '@web3jskit/type';
+import { ChainType } from '@type/chain';
 import { ProviderRpcError } from '../errors/rpc';
 import type { EventName } from './events';
 

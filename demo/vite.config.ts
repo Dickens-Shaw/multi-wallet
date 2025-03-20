@@ -24,6 +24,7 @@ export default defineConfig({
   },
   resolve: {
     alias: {
+      '@': path.resolve(__dirname, '../multi-wallet/src'),
       '@config': path.resolve(__dirname, '../multi-wallet/src/config'),
       '@type': path.resolve(__dirname, '../multi-wallet/src/types'),
       '@components': path.resolve(__dirname, '../multi-wallet/src/components'),

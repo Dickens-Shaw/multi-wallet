@@ -1,6 +1,6 @@
 import { GelWalletConnector } from '../_gel/gelConnector';
 import { type WalletInfo, type IContractOptions } from '@type/connector';
-import { ChainType } from '@web3jskit/type';
+import { ChainType } from '@type/chain';
 import { numberToHex, encodeFunctionData, getAddress, decodeFunctionResult } from 'viem';
 import { type RpcError, UserRejectedRequestError } from '../../errors/rpc';
 

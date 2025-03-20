@@ -1,4 +1,4 @@
-import { ChainType } from '@web3jskit/type';
+import { ChainType } from '@type/chain';
 import supportWallets, { SupportWallet } from '@config/walletConfig';
 import { checkIsMobile, detectWalletBrowser } from '@utils/util';
 import { ConnectorType } from '../types/connector';

@@ -2,7 +2,7 @@ import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 import type { Connector, IContractOptions } from '@type/connector';
 import { ConnectStatus } from '@type/connector';
-import { ChainType } from '@web3jskit/type';
+import { ChainType } from '@type/chain';
 import type { SupportWallet } from '@config/walletConfig';
 import { createConnectorProxy } from '@utils/proxy';
 import { EvmNetworks, TronNetworks } from '@config/netConfig';
@@ -88,6 +88,7 @@ export const walletHelperStore = create<WalletHelperState>()(
 			getSupportNets: () => {
 				const { currentChainType, customEvmNetworks } = get();
 				if (currentChainType === ChainType.EVM) {
+					console.log('getSupportNets:EVM', [...EvmNetworks, ...customEvmNetworks]);
 					return [...EvmNetworks, ...customEvmNetworks];
 				} else if (currentChainType === ChainType.Tron) {
 					return TronNetworks;

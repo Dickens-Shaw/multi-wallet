@@ -1,14 +1,11 @@
 'use client';
 import { createContext, type ReactNode, useEffect, useMemo } from 'react';
-import { ChainType } from '@web3jskit/wallethelper';
+import { ChainType } from '@type/chain';
 import { useWalletKit } from '@hooks/useWalletKit';
-import {
-	createConnector,
-	SupportWallet,
-	ConnectStatus,
-	type Connector,
-	type NetworkInfo
-} from '@web3jskit/wallethelper';
+import type { SupportWallet } from '@/config/walletConfig';
+import type { NetworkInfo } from '@/types/net';
+import { createConnector } from '@/connectors/createConnectors';
+import { ConnectStatus, type Connector } from '@/types/connector';
 
 interface IChainProvider {
 	children: ReactNode;

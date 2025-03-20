@@ -33,6 +33,7 @@
 		"outDir": "dist", // 指定输出目录
 		"baseUrl": ".",
 		"paths": {
+			"@/*": ["./src/*"],
 			"@type/*": ["./src/types/*"],
 			"@config/*": ["./src/config/*"],
 			"@components/*": ["./src/components/*"],

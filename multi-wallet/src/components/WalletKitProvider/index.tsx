@@ -7,7 +7,9 @@ import type { Locals, Theme } from '@type/configType';
 import { WalletKitThemeProvider } from './ThemeProvider';
 import { ThemedGlobalStyle } from '../../theme';
 import { WalletInfoModal } from '../Modal/WalletInfoModal';
-import { ChainType, type SupportWallet, type NetworkInfo } from '@web3jskit/wallethelper';
+import { ChainType } from '@/types/chain';
+import type { SupportWallet } from '@/config/walletConfig';
+import type { NetworkInfo } from '@/types/net';
 
 interface IWalletKitProvider {
 	children: ReactNode;

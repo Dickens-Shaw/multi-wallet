@@ -1,4 +1,4 @@
-import { ChainType } from '@web3jskit/type';
+import { ChainType } from '@type/chain';
 import {
 	MetaMaskIcon,
 	PhantomIcon,

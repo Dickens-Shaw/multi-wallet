@@ -5,7 +5,7 @@ import { FlexBox } from '../../styled';
 import Icon from '../Icon';
 import WalletItem from './style';
 import { useWalletKit } from '@hooks/useWalletKit';
-import { ConnectorType } from '@web3jskit/wallethelper';
+import { ConnectorType } from '@type/connector';
 
 export interface IWalletTriggerButton {
 	connector: any;

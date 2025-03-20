@@ -1,7 +1,7 @@
-import { walletHelperStore, type WalletHelperState } from '@web3jskit/wallethelper';
+import { walletHelperStore, type WalletHelperState } from '@stores/coreStore';
 import { walletKitStore, type WalletKitState } from '@stores/index';
 import { useModalStore } from '@stores/modalStore';
-import type { Connector } from '@web3jskit/wallethelper/dist/src/core/types/connector';
+import type { Connector } from '@type/connector';
 
 type WalletKitStoreState = WalletHelperState & WalletKitState;
 

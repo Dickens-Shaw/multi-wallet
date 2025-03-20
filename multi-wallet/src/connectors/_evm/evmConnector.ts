@@ -13,7 +13,7 @@ import { numberToHex, encodeFunctionData, stringToHex, getAddress, decodeFunctio
 import { uid } from '@utils/uid';
 import { BaseConnector } from '../baseConnector';
 import { ConnectorType } from '@type/connector';
-import { ChainType } from '@web3jskit/type';
+import { ChainType } from '@type/chain';
 import BigNumber from 'bignumber.js';
 
 declare global {

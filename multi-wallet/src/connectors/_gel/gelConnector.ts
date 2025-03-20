@@ -1,6 +1,6 @@
 import { ConnectorType, type WalletInfo } from '@type/connector';
 import { BaseConnector } from '../baseConnector';
-import { ChainType } from '@web3jskit/type';
+import { ChainType } from '@type/chain';
 import { SupportWallet } from '@config/walletConfig';
 
 declare global {

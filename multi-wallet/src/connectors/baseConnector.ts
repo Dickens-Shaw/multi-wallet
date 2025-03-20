@@ -1,4 +1,4 @@
-import type { ChainType } from '@web3jskit/type';
+import type { ChainType } from '@type/chain';
 import type { Connector, WalletInfo } from '@type/connector';
 import type { EventName } from '@type/events';
 import { ConnectStatus, ConnectorType } from '@type/connector';

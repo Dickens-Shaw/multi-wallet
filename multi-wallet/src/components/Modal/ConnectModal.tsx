@@ -1,7 +1,8 @@
 'use client';
 import ModalHeader from '../Header/ModalHeader';
 import Modal from './index';
-import { createConnector, SupportWallets } from '@web3jskit/wallethelper';
+import { createConnector } from '@/connectors/createConnectors';
+import SupportWallets from '@config/walletConfig';
 import { useTranslation } from 'react-i18next';
 import { useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { WalletTriggerButton } from '../WalletTriggerButton';

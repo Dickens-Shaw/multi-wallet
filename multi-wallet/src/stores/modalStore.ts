@@ -1,6 +1,5 @@
 import { create } from 'zustand';
 import type { StoreSet, StoreGet } from '@type/store';
-// import { detectWalletBrowser } from '@web3jskit/wallethelper';
 
 interface ConnectModalData {
 	onError: (error: any) => void;

@@ -1,6 +1,6 @@
 import { type WalletInfo } from '@type/connector';
 import { GelWalletConnector } from '../_gel/gelConnector';
-import { ChainType } from '@web3jskit/type';
+import { ChainType } from '@type/chain';
 
 export default class GelWalletSolConnector extends GelWalletConnector {
 	constructor(info: WalletInfo) {

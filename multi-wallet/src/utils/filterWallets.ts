@@ -1,4 +1,4 @@
-import { ChainType } from '@web3jskit/type';
+import { ChainType } from '@type/chain';
 import SupportWallets from '@config/walletConfig';
 
 export function filterWallets(chainType: ChainType): any[] {
