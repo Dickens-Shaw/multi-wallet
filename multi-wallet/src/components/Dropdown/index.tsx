@@ -22,7 +22,7 @@ interface DropdownProps {
 const Dropdown = ({
 	options,
 	value = '',
-	placeholder = '请选择',
+	placeholder = 'Select',
 	disabled = false,
 	showArrow = true,
 	onChange,

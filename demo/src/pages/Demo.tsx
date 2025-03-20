@@ -1,4 +1,4 @@
-import { ConnectButton, ChainType, useWalletKit, getWalletKit, PutNetType, SolNetType } from 'multi-wallet';
+import { ConnectButton, ChainType, useWalletKit, getWalletKit, PutNetType, SolNetType, ConnectStatus } from 'multi-wallet';
 import { useEffect, useMemo, useState } from 'react';
 import { Connection, Keypair, PublicKey, SystemProgram, Transaction } from '@solana/web3.js';
 
@@ -8,7 +8,7 @@ declare global {
 	}
 }
 
-// 在类外部声明这些常量
+// Constants declared outside the class
 const MULTICALL3_ADDRESS = '0xe0E7B3133B41E9b5F9858C370FB9909E77Bc247c';
 
 const MULTICALL3_ABI = [
@@ -458,6 +458,7 @@ const Demo = () => {
 		currentChainType,
 		setChainType,
 		currentConnector,
+		connectStatus,
 		theme,
 		toggleTheme,
 		language,
@@ -468,7 +469,6 @@ const Demo = () => {
 		getProvider,
 		provider,
 		showWalletInfo,
-		connectStatus,
 		disconnect,
 		signMessage,
 		signTransaction,
@@ -545,27 +545,27 @@ const Demo = () => {
 	const generateSolTransaction = async () => {
 		const connection = new Connection('https://api.devnet.solana.com', 'confirmed');
 
-		// 创建一个密钥对（发起者）
+		// Create a key pair (initiator)
 		const senderKeypair = Keypair.generate();
 
-		// 创建接收者公钥
-		const recipientPublicKey = new PublicKey('Ab1KyvCkUgsPuJVqThBZ91uZ6cCrtgKeN4tH7moFQA6a'); // 替换为接收者地址
+		// Create recipient public key
+		const recipientPublicKey = new PublicKey('Ab1KyvCkUgsPuJVqThBZ91uZ6cCrtgKeN4tH7moFQA6a'); // Replace with recipient address
 
-		// 创建转账指令
+		// Create transfer instruction
 		const transaction = new Transaction().add(
 			SystemProgram.transfer({
 				fromPubkey: senderKeypair.publicKey,
 				toPubkey: recipientPublicKey,
-				lamports: BigInt(1) // 转账金额
+				lamports: BigInt(1) // Transfer amount
 			})
 		);
 
-		// 获取最新的区块哈希
+		// Get the latest block hash
 		const recentBlockhash = await connection.getLatestBlockhash();
 		transaction.recentBlockhash = recentBlockhash.blockhash;
-		transaction.feePayer = senderKeypair.publicKey; // 设置费用支付者
+		transaction.feePayer = senderKeypair.publicKey; // Set fee payer
 
-		// 对交易进行签名
+		// Sign the transaction
 		await transaction.sign(senderKeypair);
 		setSolTransaction(transaction);
 	};
@@ -589,7 +589,7 @@ const Demo = () => {
 	return (
 		<div>
 			<div>
-				theme：{theme}，language：{language}
+				theme: {theme}, language: {language}
 			</div>
 			<div style={{ display: 'flex', gap: '15px', marginTop: '15px' }}>
 				<button onClick={() => toggleTheme()}>change theme</button>
@@ -597,42 +597,47 @@ const Demo = () => {
 			</div>
 			<h2>Connect Button</h2>
 			<ConnectButton />
-			<h2>Hooks</h2>
+			<h2>Info</h2>
 			<p></p>
-			<div>当 前 链：{currentChainType}</div>
+			<div>Current Chain: {currentChainType}</div>
 			{[ChainType.EVM, ChainType.Tron].includes(currentChainType) && (
 				<div>
-					当 前 网：
+					Current Network: 
 					{`${currentNetwork?.nativeCurrency.symbol}-(${currentNetwork?.chainId})-[${currentNetwork?.chainName}]`}
 				</div>
 			)}
-			<div>钱 包 名：{currentConnector?.name}</div>
+			<div>Wallet Name: {currentConnector?.name}</div>
 			<div
 				style={{
 					wordWrap: 'break-word'
 				}}
 			>
-				钱包地址：{walletAddress}
+				Wallet Address: {walletAddress}
 			</div>
-			<p>基础方法</p>
+			<h2>Methods</h2>
+			<p>Basic</p>
 			<div style={{ display: 'flex', gap: '15px', marginTop: '15px', flexWrap: 'wrap' }}>
-				<button onClick={() => handleConnect()}>连接钱包</button>
-				<button onClick={() => handleDisconnect()}>断开链接</button>
-				<button onClick={openInfoModal}>打开 Info Modal</button>
-				<button onClick={handleGetWalletKit}>获取 walletKit</button>
-				<button onClick={() => handleGetProvider()}>获取 Provider</button>
+				<button onClick={() => handleConnect()}>Connect Wallet</button>
+				<button onClick={() => handleDisconnect()}>Disconnect</button>
+				<button onClick={openInfoModal}>Open Info Modal</button>
+				<button onClick={handleGetWalletKit}>Get WalletKit</button>
+				<button onClick={() => handleGetProvider()}>Get Provider</button>
 			</div>
-			<p>切链</p>
-			<div style={{ display: 'flex', gap: '15px', marginTop: '15px', flexWrap: 'wrap' }}>
+			{connectStatus === ConnectStatus.Disconnected && (
+				<>
+					<p>Switch Chain</p>
+					<div style={{ display: 'flex', gap: '15px', marginTop: '15px', flexWrap: 'wrap' }}>
 				{chainList.map(chainType => (
 					<button key={chainType} onClick={() => setChainType(chainType)}>
-						切换{chainType}
+						Switch to {chainType}
 					</button>
 				))}
-			</div>
+					</div>
+				</>
+			)}
 			{[ChainType.EVM, ChainType.Tron].includes(currentChainType) && (
-				<div>
-					<p>切换{ChainType.EVM === currentChainType ? 'EVM' : 'Tron'}网络</p>
+				<>
+					<p>Switch {ChainType.EVM === currentChainType ? 'EVM' : 'Tron'} Network</p>
 					<div style={{ display: 'flex', gap: '15px', marginTop: '15px', flexWrap: 'wrap' }}>
 						{getSupportNets().map(net => (
 							<button
@@ -645,32 +650,32 @@ const Demo = () => {
 									}
 								}}
 							>
-								切换 {net.chainName}
+								Switch to {net.chainName}
 							</button>
 						))}
 					</div>
-				</div>
+				</>
 			)}
 			{[ChainType.SOL, ChainType.PUT].includes(currentChainType as any) && (
-				<div>
+				<>
 					<p>
-						切换
+						Switch to 
 						{ChainType.SOL === currentChainType ? 'SOL' : 'PUT'}
-						网络
+						Network
 					</p>
 					<div style={{ display: 'flex', gap: '15px', marginTop: '15px', flexWrap: 'wrap' }}>
 						{netWorks.map((net: string) => (
 							<button key={net} onClick={() => handleSwitchNet(net)}>
-								切换{net}
+								Switch to {net}
 							</button>
 						))}
 					</div>
-				</div>
+				</>
 			)}
 			<div>
 				{ChainType.EVM === currentChainType && (
-					<div>
-						<h2>EVM Proxy Function</h2>
+					<>
+						<p>EVM Proxy Function</p>
 						<div style={{ display: 'flex', gap: '15px', marginTop: '15px', flexWrap: 'wrap' }}>
 							<button onClick={() => disconnect()}>disconnect</button>
 							<button onClick={() => signMessage('123')}>signMessage</button>
@@ -819,29 +824,29 @@ const Demo = () => {
 								multicall
 							</button>
 						</div>
-					</div>
+					</>
 				)}
 				{[ChainType.SOL, ChainType.PUT].includes(currentChainType) && (
-					<div>
-						<h2>{ChainType.SOL === currentChainType ? 'SOL' : 'PUT'} Proxy Function</h2>
+					<>
+						<p>{ChainType.SOL === currentChainType ? 'SOL' : 'PUT'} Proxy Function</p>
 						<div style={{ display: 'flex', gap: '15px', marginTop: '15px', flexWrap: 'wrap' }}>
 							<button onClick={() => disconnect()}>disconnect</button>
 							<button onClick={() => signMessage('123')}>signMessage</button>
 							<button onClick={() => signTransaction(solTransaction)}>signTransaction</button>
 							<button onClick={() => sendTransaction(solTransaction)}>sendTransaction</button>
 						</div>
-					</div>
+					</>
 				)}
 				{ChainType.Tron === currentChainType && (
-					<div>
-						<h2>Tron Proxy Function</h2>
+					<>
+						<p>Tron Proxy Function</p>
 						<div style={{ display: 'flex', gap: '15px', marginTop: '15px', flexWrap: 'wrap' }}>
 							<button onClick={() => disconnect()}>disconnect</button>
 							<button onClick={() => signMessage('123')}>signMessage</button>
 							<button
 								onClick={() =>
 									signTransaction({
-										to: 'TEQtdcENmGETfZ2pZKZdBZFxD18MXF2zSu', // WETH 合约地址
+										to: 'TEQtdcENmGETfZ2pZKZdBZFxD18MXF2zSu', // WETH contract address
 										value: 10
 									})
 								}
@@ -851,7 +856,7 @@ const Demo = () => {
 							<button
 								onClick={async () => {
 									const res = await sendTransaction({
-										to: 'TEQtdcENmGETfZ2pZKZdBZFxD18MXF2zSu', // WETH 合约地址
+										to: 'TEQtdcENmGETfZ2pZKZdBZFxD18MXF2zSu', // WETH contract address
 										value: 10
 									});
 									console.log('sendTransactionSuccess', res);
@@ -937,7 +942,7 @@ const Demo = () => {
 								waitForTransactionReceipt
 							</button>
 						</div>
-					</div>
+					</>
 				)}
 			</div>
 		</div>

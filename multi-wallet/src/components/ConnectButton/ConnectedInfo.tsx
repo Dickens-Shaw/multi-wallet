@@ -20,7 +20,7 @@ export function ConnectedInfo({ avatar, walletAddress, onClick, className }: any
 
 	return (
 		<WalletInfoInfoWrap className={className}>
-			{showNetwork && (
+			{showNetwork && supportNets.length > 0 && (
 				<Dropdown
 					value={currentNetwork?.chainId}
 					options={supportNets.map(net => ({ value: net.chainId, label: net.nativeCurrency.symbol || net.chainName }))}
