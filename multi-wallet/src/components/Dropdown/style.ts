@@ -9,7 +9,7 @@ const DropdownContainer = styled.div<{ $isOpen: boolean; $disabled: boolean }>`
 
 const DropdownLabel = styled.div`
 	padding: 1px 6px;
-	border: 2px solid #000;
+	border: 1px solid #000;
 	background: rgb(239, 239, 239);
 	transition: all 0.2s;
 
@@ -24,7 +24,7 @@ const DropdownList = styled.ul<{ $isOpen: boolean }>`
 	max-height: 200px;
 	margin-top: 4px;
 	padding: 0;
-	border: 2px solid #000;
+	border: 1px solid #000;
 	background: white;
 	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 	overflow-y: auto;
